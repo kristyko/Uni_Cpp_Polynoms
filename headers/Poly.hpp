@@ -13,8 +13,10 @@
 #ifndef Poly_hpp
 #define Poly_hpp
 
+#include <fstream>
 #include <iostream>
 #include <vector>
+#include <string>
 #include "Field.hpp"
 
 

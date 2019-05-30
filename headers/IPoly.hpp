@@ -28,7 +28,9 @@ public:
     IPoly (const IPoly &other);
     
     virtual void print() const;
-    virtual void setCoef(unsigned long n, int value);
+    void putToFile (std::string filename) const;
+    virtual void setCoef( size_t n, int value);
+    void pushBackCoeff(int value);
     virtual float value(float x);
     
     IPoly& operator+= (const IPoly &other);

@@ -31,9 +31,12 @@ public:
     MPoly& operator= ( const MPoly &other );
    
     void print () const;
+    void putToFile (std::string filename) const;
     void setBase( unsigned base );
-    void setCoef( unsigned long n, Field value );
-    virtual void setCoef( unsigned long n, int value );
+    void setCoef( size_t n, Field value );
+    void pushBackCoeff( int value );
+    void pushBackCoeff( Field value );
+    virtual void setCoef( size_t n, int value );
     virtual float value( float x );
 
     MPoly& operator+= ( const MPoly &other );

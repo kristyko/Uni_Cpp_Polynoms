@@ -28,6 +28,7 @@ public:
     
     int get_value() const;
     static unsigned get_base();
+    static bool isPrime( unsigned n );
     static void set_base(unsigned base);
     friend std::ostream& operator<< (std::ostream &out, const Field& element);
 
