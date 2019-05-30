@@ -65,8 +65,26 @@ void IPoly::print () const
     std::cout << std::endl;
 }
 
+void IPoly::putToFile (std::string filename) const
+{
+    std::fstream file(filename, std::ios::app );
+    for ( unsigned i=0; i <= _deg; i++)
+    {
+        if ( _p[i] )
+        {
+            file << _p[i] << "x^" << i;
+        }
+        if ( i < _deg && _p[i+1] )
+        {
+            file << " + ";
+        }
+        
+    }
+    file << std::endl;
+}
+
 // setting coefficient
-void IPoly::setCoef(unsigned long n, int value)
+void IPoly::setCoef(size_t n, int value)
 {
     if ( n <= _deg)
     {
@@ -79,6 +97,19 @@ void IPoly::setCoef(unsigned long n, int value)
         for ( unsigned long i=_deg + 1; i < n; i++) { _p.push_back(0); }
         _p.push_back(value);
         _deg = n;
+    }
+}
+
+void IPoly::pushBackCoeff( int value )
+{
+    if ( _deg == 0 && _p[0] == 0)
+    {
+        _p[0] = value;
+    }
+    else
+    {
+        _p.push_back(value);
+        _deg++ ;
     }
 }
 
@@ -107,13 +138,13 @@ IPoly& IPoly::operator+= (const IPoly &other)
     }
     else
     {
-        for ( unsigned long i = 0; i <= this->_deg; i++)
+        for ( size_t i = 0; i <= this->_deg; i++)
         {
             this->_p[i] += other._p[i];
         }
         // if _deg of this is less than _deg of other
         // we need to make size of this->_p equal to other._deg + 1
-        for ( unsigned long i = this->_deg + 1; i <= other._deg; i++)
+        for ( size_t i = this->_deg + 1; i <= other._deg; i++)
         {
             (this->_p).push_back(other._p[i]);
         }
@@ -128,7 +159,7 @@ const IPoly IPoly::operator+ (const IPoly &other)
     if ( this->_deg >= other._deg )
     {
         res = *this;
-        for ( unsigned long i = 0; i <= other._deg; i++)
+        for ( size_t i = 0; i <= other._deg; i++)
         {
             res.setCoef(i, this->_p[i] + other._p[i]);
         }
@@ -136,7 +167,7 @@ const IPoly IPoly::operator+ (const IPoly &other)
     else
     {
         res = other;
-        for ( unsigned long i = 0; i <= this->_deg; i++)
+        for ( size_t i = 0; i <= this->_deg; i++)
         {
             res.setCoef(i, this->_p[i] + other._p[i]);
         }
@@ -150,18 +181,18 @@ IPoly& IPoly::operator-= (const IPoly &other)
 {
     if ( this->_deg >= other._deg )
     {
-        for ( unsigned long i = 0; i <= other._deg; i++)
+        for ( size_t i = 0; i <= other._deg; i++)
         {
             this->_p[i] -= other._p[i];
         }
     }
     else
     {
-        for ( unsigned long i = 0; i <= this->_deg; i++)
+        for ( size_t i = 0; i <= this->_deg; i++)
         {
             this->_p[i] -= other._p[i];
         }
-        for ( unsigned long i = this->_deg + 1; i <= other._deg; i++)
+        for ( size_t i = this->_deg + 1; i <= other._deg; i++)
         {
             (this->_p).push_back(-other._p[i]);
         }
@@ -176,7 +207,7 @@ const IPoly IPoly::operator- (const IPoly &other)
     if ( this->_deg >= other._deg )
     {
         res = *this;
-        for ( unsigned long i = 0; i <= other._deg; i++)
+        for ( size_t i = 0; i <= other._deg; i++)
         {
             res.setCoef(i, this->_p[i] - other._p[i]);
         }
@@ -184,11 +215,11 @@ const IPoly IPoly::operator- (const IPoly &other)
     else
     {
         res = other;
-        for ( unsigned long i = 0; i <= this->_deg; i++)
+        for ( size_t i = 0; i <= this->_deg; i++)
         {
             res.setCoef(i, this->_p[i] - other._p[i]);
         }
-        for ( unsigned long i = this->_deg+1; i <= other._deg; i++)
+        for ( size_t i = this->_deg+1; i <= other._deg; i++)
         {
             res.setCoef(i, - other._p[i]);
         }
@@ -202,12 +233,12 @@ IPoly& IPoly::operator *= (const IPoly &other)
     std::vector <int> result(this->_deg + other._deg + 1);
     unsigned long n;
 
-    for ( int i=0; i <= this->_deg + other._deg; i++)
+    for ( size_t i=0; i <= this->_deg + other._deg; i++)
     {
         if ( this->_deg <= i ) { n = this->_deg; }
         else { n = i; }
 
-        for ( int j=0; j <= n; j++ )
+        for ( size_t j=0; j <= n; j++ )
         {
             // we need to control indexes so that we don't call non-existing coefficients of polynoms
             if ( i - j > other._deg ) { continue; }
@@ -225,12 +256,12 @@ const IPoly IPoly::operator* ( const IPoly &other )
     std::vector <int> result( this->_deg + other._deg + 1 );
     unsigned long n;
     
-    for ( int i=0; i <= this->_deg + other._deg; i++)
+    for ( size_t i=0; i <= this->_deg + other._deg; i++)
     {
         if ( this->_deg <= i ) { n = this->_deg; }
         else { n = i; }
         
-        for ( int j=0; j <= n; j++ )
+        for ( size_t j=0; j <= n; j++ )
         {
             if ( i - j > other._deg ) { continue; }
             

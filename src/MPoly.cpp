@@ -74,7 +74,7 @@ void MPoly::setBase( unsigned base )
     Field::set_base( base );
 }
 
-void MPoly::setCoef(unsigned long n, int value)
+void MPoly::setCoef(size_t n, int value)
 {
     if ( n <= _deg)
     {
@@ -88,7 +88,7 @@ void MPoly::setCoef(unsigned long n, int value)
     }
 }
 
-void MPoly::setCoef(unsigned long n, Field value)
+void MPoly::setCoef(size_t n, Field value)
 {
     if ( n <= _deg)
     {
@@ -105,6 +105,32 @@ void MPoly::setCoef(unsigned long n, Field value)
     }
 }
 
+void MPoly::pushBackCoeff(int value)
+{
+    if ( _deg == 0 && _p[0].get_value() == 0)
+    {
+        _p[0] = Field(value);
+    }
+    else
+    {
+        _p.push_back(Field(value));
+        _deg++ ;
+    }
+}
+
+void MPoly::pushBackCoeff(Field value)
+{
+    if ( _deg == 0 && _p[0].get_value() == 0)
+    {
+        _p[0] = value;
+    }
+    else
+    {
+        _p.push_back(value);
+        _deg++ ;
+    }
+}
+
 void MPoly::print () const
 {
     for ( size_t i=0; i <= _deg; ++i)
@@ -113,6 +139,24 @@ void MPoly::print () const
         if ( i < _deg && _p[i+1].get_value() ) { std::cout << " + "; }
     }
     std::cout << std::endl;
+}
+
+void MPoly::putToFile (std::string filename) const
+{
+    std::fstream file(filename, std::ios::app );
+    for ( unsigned i=0; i <= _deg; i++)
+    {
+        if ( _p[i].get_value() )
+        {
+            file << _p[i] << "x^" << i;
+        }
+        if ( i < _deg && _p[i+1].get_value() )
+        {
+            file << " + ";
+        }
+        
+    }
+    file << std::endl;
 }
 
 // calculating value of MPoly
@@ -132,18 +176,18 @@ MPoly& MPoly::operator+= ( const MPoly &other )
 {
     if ( this->_deg >= other._deg )
     {
-        for ( unsigned long i = 0; i <= other._deg; i++ )
+        for ( size_t i = 0; i <= other._deg; i++ )
         {
             this->_p[i] += other._p[i];
         }
     }
     else
     {
-        for ( unsigned long i = 0; i <= this->_deg; i++ )
+        for ( size_t i = 0; i <= this->_deg; i++ )
         {
             this->_p[i] += other._p[i];
         }
-        for ( unsigned long i = this->_deg + 1; i <= other._deg; i++)
+        for ( size_t i = this->_deg + 1; i <= other._deg; i++)
         {
             this->setCoef(i, other._p[i]);
         }
@@ -157,7 +201,7 @@ const MPoly MPoly::operator+ (const MPoly &other)
     if ( this->_deg >= other._deg )
     {
         res = *this;
-        for ( unsigned long i = 0; i <= other._deg; i++)
+        for ( size_t i = 0; i <= other._deg; i++)
         {
             res.setCoef(i, this->_p[i] + other._p[i]);
         }
@@ -165,7 +209,7 @@ const MPoly MPoly::operator+ (const MPoly &other)
     else
     {
         res = other;
-        for ( unsigned long i = 0; i <= this->_deg; i++)
+        for ( size_t i = 0; i <= this->_deg; i++)
         {
             res.setCoef(i, this->_p[i] + other._p[i]);
         }
@@ -178,7 +222,7 @@ MPoly& MPoly::operator-= (const MPoly &other)
 {
     if ( this->_deg >= other._deg )
     {
-        for ( unsigned long i = 0; i <= other._deg; i++)
+        for ( size_t i = 0; i <= other._deg; i++)
         {
             this->_p[i] -= other._p[i];
         }
@@ -186,11 +230,11 @@ MPoly& MPoly::operator-= (const MPoly &other)
 
     else
     {
-        for ( unsigned long i = 0; i <= this->_deg; i++)
+        for ( size_t i = 0; i <= this->_deg; i++)
         {
             this->_p[i] -= other._p[i];
         }
-        for ( unsigned long i = this->_deg + 1; i <= other._deg; i++)
+        for ( size_t i = this->_deg + 1; i <= other._deg; i++)
         {
             this->setCoef(i, Field(0) - other._p[i]);
         }
@@ -204,7 +248,7 @@ const MPoly MPoly::operator- (const MPoly &other)
     if ( this->_deg >= other._deg )
     {
         res = *this;
-        for ( unsigned long i = 0; i <= other._deg; i++)
+        for ( size_t i = 0; i <= other._deg; i++)
         {
             res.setCoef(i, this->_p[i] - other._p[i]);
         }
@@ -212,11 +256,11 @@ const MPoly MPoly::operator- (const MPoly &other)
     else
     {
         res = other;
-        for ( unsigned long i = 0; i <= this->_deg; i++)
+        for ( size_t i = 0; i <= this->_deg; i++)
         {
             res.setCoef(i, this->_p[i] - other._p[i]);
         }
-        for ( unsigned long i = this->_deg+1; i <= other._deg; i++)
+        for ( size_t i = this->_deg+1; i <= other._deg; i++)
         {
             res.setCoef(i, Field(0) - other._p[i]);
         }
@@ -272,7 +316,7 @@ MPoly& MPoly::operator /= (const MPoly &other)
 {
     if ( this->_deg >= other._deg )
     {
-        unsigned long n = this->_deg - other._deg;
+        size_t n = this->_deg - other._deg;
         MPoly result;
         for ( int i=0; i <= n; i++)
         {
@@ -294,8 +338,8 @@ const MPoly MPoly::operator / (const MPoly &other)
     if ( this->_deg >= other._deg )
     {
         MPoly poly = *this;
-        unsigned long n = this->_deg - other._deg;
-        for ( int i=0; i <= n; i++)
+        size_t n = this->_deg - other._deg;
+        for ( size_t i=0; i <= n; i++)
         {
             MPoly p;
             p.setCoef(poly._deg - other._deg, poly._p[poly._deg] / other._p[other._deg] );
@@ -312,15 +356,14 @@ MPoly& MPoly::operator%= ( const MPoly &other )
 {
     if ( this->_deg >= other._deg )
     {
-        unsigned long n = this->_deg - other._deg;
+        size_t n = this->_deg - other._deg;
         MPoly result;
-        for ( int i=0; i <= n; i++)
+        for ( size_t i=0; i <= n; i++)
         {
             MPoly p;
             p.setCoef(this->_deg - other._deg, _p[_deg] / other._p[other._deg] );
-//            result += p;
             *this -= p * other;
-            this->_deg -= 1;   // TODO a function that automatically destoys zero coeff
+            this->_deg -= 1;
         }
     }
     return *this;
@@ -328,16 +371,14 @@ MPoly& MPoly::operator%= ( const MPoly &other )
 
 const MPoly MPoly::operator% ( const MPoly &other )
 {
-//    IPoly result;
     MPoly poly = *this;
     if ( this->_deg >= other._deg )
     {
-        unsigned long n = this->_deg - other._deg;
-        for ( int i=0; i <= n; i++)
+        size_t n = this->_deg - other._deg;
+        for ( size_t i=0; i <= n; i++)
         {
             MPoly p;
             p.setCoef(poly._deg - other._deg, poly._p[poly._deg] / other._p[other._deg] );
-//            result += p;
             poly -= p * other;
             poly._deg -= 1;
         }

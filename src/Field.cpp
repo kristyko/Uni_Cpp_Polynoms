@@ -80,7 +80,7 @@ int Field::get_value() const
 
 // helper function
 // checks whether a number is prime
-bool isPrime( unsigned n )
+bool Field::isPrime( unsigned n )
 {
     if ( n == 1 or n == 0) { return 0; }
     for ( int i = 2; i <= sqrt(n); i++)
@@ -95,7 +95,7 @@ bool isPrime( unsigned n )
 // in other case base stays the same
 void Field::set_base( unsigned base )
 {
-    if ( (isPrime( base )) || (base == 1))
+    if ( (isPrime( base ) ) || (base == 1))
     {
         _base = base;
     }
